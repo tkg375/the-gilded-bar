@@ -13,7 +13,7 @@ NEXT_PUBLIC_APP_URL = "https://thegildedbar.com"
 [[d1_databases]]
 binding = "DB"
 database_name = "gilded-bar-db"
-database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+database_id = "a2023002-1f3c-4b80-afbe-7b7f610b41a9"
 
 [[r2_buckets]]
 binding = "IMAGES"
