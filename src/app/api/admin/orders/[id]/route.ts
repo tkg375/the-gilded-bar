@@ -4,7 +4,6 @@ import { verifyAdminToken, COOKIE_NAME } from "@/lib/admin-auth";
 import { db } from "@/lib/db";
 import type { OrderStatus } from "@/lib/types";
 
-export const runtime = "edge";
 
 async function requireAdmin() {
   const cookieStore = await cookies();
@@ -28,6 +27,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!validStatuses.includes(status)) {
     return NextResponse.json({ error: "Invalid status" }, { status: 400 });
   }
+
+  const order = await db.getOrder(id);
+  if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
   await db.updateOrder(id, { status });
+
+  // Restore stock when cancelling a paid/shipped/delivered order
+  const stockWasDecremented = ["paid", "shipped", "delivered"].includes(order.status);
+  if (status === "cancelled" && order.status !== "cancelled" && stockWasDecremented) {
+    for (const item of order.items) {
+      await db.incrementStock(item.productId, item.quantity);
+    }
+  }
+
   return NextResponse.json({ success: true });
 }

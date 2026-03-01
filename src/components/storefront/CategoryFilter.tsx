@@ -21,7 +21,7 @@ export default function CategoryFilter({ categories }: { categories: Category[] 
         className={`px-4 py-1.5 rounded-full text-sm font-medium border transition ${
           !active
             ? "bg-amber-800 text-white border-amber-800"
-            : "border-stone-300 text-stone-600 hover:border-amber-500"
+            : "border-stone-300 text-peach-600 hover:border-amber-500"
         }`}
       >
         All
@@ -33,7 +33,7 @@ export default function CategoryFilter({ categories }: { categories: Category[] 
           className={`px-4 py-1.5 rounded-full text-sm font-medium border transition ${
             active === c.slug
               ? "bg-amber-800 text-white border-amber-800"
-              : "border-stone-300 text-stone-600 hover:border-amber-500"
+              : "border-stone-300 text-peach-600 hover:border-amber-500"
           }`}
         >
           {c.name}

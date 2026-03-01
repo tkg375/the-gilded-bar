@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { verifyAdminToken, COOKIE_NAME } from "@/lib/admin-auth";
 import { db } from "@/lib/db";
 
-export const runtime = "edge";
 
 export async function GET() {
   const cookieStore = await cookies();

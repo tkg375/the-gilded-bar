@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-stone-200 p-8">
         <h1 className="text-2xl font-semibold text-stone-800 mb-1">Admin</h1>
-        <p className="text-sm text-stone-500 mb-6">The Gilded Bar dashboard</p>
+        <p className="text-sm text-stone-500 mb-6">Georgia Suds dashboard</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">Password</label>

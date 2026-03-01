@@ -3,7 +3,8 @@ import Image from "next/image";
 import { db } from "@/lib/db";
 import AddToCartButton from "@/components/storefront/AddToCartButton";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
+
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -44,12 +45,31 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <p className="text-2xl font-semibold text-stone-800 mb-6">${(product.price / 100).toFixed(2)}</p>
           <p className="text-stone-600 leading-relaxed mb-8">{product.description}</p>
           <div className="mb-4">
-            {product.stock > 0 ? (
-              <p className="text-sm text-green-600 mb-4">{product.stock} in stock</p>
-            ) : (
-              <p className="text-sm text-red-500 mb-4">Out of stock</p>
-            )}
-            <AddToCartButton product={product} />
+            {(() => {
+              const isComingSoon = product.comingSoon && (!product.availableAt || new Date() < new Date(product.availableAt));
+              if (isComingSoon) {
+                return (
+                  <div className="space-y-2">
+                    <span className="inline-block bg-indigo-600 text-white text-sm font-semibold px-4 py-1.5 rounded-full">Coming Soon</span>
+                    {product.availableAt && (
+                      <p className="text-sm text-stone-500">
+                        Available {new Date(product.availableAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}
+                      </p>
+                    )}
+                  </div>
+                );
+              }
+              return (
+                <>
+                  {product.stock > 0 ? (
+                    <p className="text-sm text-green-600 mb-4">{product.stock} in stock</p>
+                  ) : (
+                    <p className="text-sm text-red-500 mb-4">Out of stock</p>
+                  )}
+                  <AddToCartButton product={product} />
+                </>
+              );
+            })()}
           </div>
         </div>
       </div>

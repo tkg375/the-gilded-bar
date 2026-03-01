@@ -1,9 +1,24 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-serif: Georgia, "Times New Roman", serif;
+  --font-serif: var(--font-bubble), Georgia, "Times New Roman", serif;
+  --font-bubble: var(--font-bubble), sans-serif;
+  --color-peach-50:  #fff4ec;
+  --color-peach-100: #ffe4d0;
+  --color-peach-200: #ffc9a0;
+  --color-peach-300: #e0a888;
+  --color-peach-400: #d08a68;
+  --color-peach-500: #c06845;
+  --color-peach-600: #a04828;
+  --color-peach-700: #8a3820;
+  --color-peach-800: #5a2010;
+  --color-peach-900: #2e1208;
 }
 
 body {
   font-family: system-ui, -apple-system, sans-serif;
+}
+
+a, button, [role="button"], select, label[for], input[type="checkbox"], input[type="radio"] {
+  cursor: pointer;
 }

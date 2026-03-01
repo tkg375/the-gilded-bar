@@ -3,8 +3,6 @@ import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 
-export const runtime = "edge";
-
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -29,18 +27,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // ── checkout.session.completed (legacy hosted checkout) ──────────────────────
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const orderId = session.metadata?.orderId;
 
-    if (!orderId) {
-      return NextResponse.json({ error: "No orderId in metadata" }, { status: 400 });
-    }
+    if (!orderId) return NextResponse.json({ received: true });
 
     const order = await db.getOrder(orderId);
-    if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
-    }
+    if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    if (order.status === "paid") return NextResponse.json({ received: true });
 
     const rawSession = session as unknown as Record<string, unknown>;
     const shipping = rawSession.shipping_details as
@@ -65,7 +61,55 @@ export async function POST(req: NextRequest) {
         : undefined,
     });
 
-    // Decrement stock for each item
+    for (const item of order.items) {
+      await db.decrementStock(item.productId, item.quantity);
+    }
+  }
+
+  // ── payment_intent.succeeded (custom checkout) ───────────────────────────────
+  if (event.type === "payment_intent.succeeded") {
+    const pi = event.data.object as Stripe.PaymentIntent;
+    const orderId = pi.metadata?.orderId;
+
+    if (!orderId) return NextResponse.json({ received: true });
+
+    const order = await db.getOrder(orderId);
+    if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+
+    // Idempotency guard — don't double-decrement stock
+    if (order.status === "paid") return NextResponse.json({ received: true });
+
+    // Get customer email from the charge's billing_details
+    let customerEmail = "";
+    if (typeof pi.latest_charge === "string") {
+      try {
+        const charge = await getStripe().charges.retrieve(pi.latest_charge);
+        customerEmail = charge.billing_details?.email ?? "";
+      } catch {
+        // Non-fatal — order is still fulfilled, email just won't be stored
+      }
+    }
+
+    // Shipping is stored on pi.shipping when passed via confirmParams.shipping
+    const piShipping = pi.shipping;
+
+    await db.updateOrder(orderId, {
+      status: "paid",
+      stripePaymentIntentId: pi.id,
+      customerEmail,
+      shippingAddress: piShipping?.address
+        ? {
+            name: piShipping.name ?? "",
+            line1: piShipping.address.line1 ?? "",
+            line2: piShipping.address.line2 ?? "",
+            city: piShipping.address.city ?? "",
+            state: piShipping.address.state ?? "",
+            postalCode: piShipping.address.postal_code ?? "",
+            country: piShipping.address.country ?? "",
+          }
+        : undefined,
+    });
+
     for (const item of order.items) {
       await db.decrementStock(item.productId, item.quantity);
     }

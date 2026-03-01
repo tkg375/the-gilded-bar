@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { verifyAdminToken, COOKIE_NAME } from "@/lib/admin-auth";
 import { db } from "@/lib/db";
 
-export const runtime = "edge";
 
 async function requireAdmin() {
   const cookieStore = await cookies();
@@ -33,6 +32,9 @@ export async function POST(req: NextRequest) {
     stock: Number(body.stock),
     category: body.category ?? "",
     active: body.active ?? true,
+    tags: body.tags ?? [],
+    comingSoon: body.comingSoon ?? false,
+    availableAt: body.availableAt ?? null,
     createdAt: new Date().toISOString(),
   });
   return NextResponse.json({ product }, { status: 201 });

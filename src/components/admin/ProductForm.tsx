@@ -2,7 +2,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploader from "./ImageUploader";
-import type { Product, Category } from "@/lib/types";
+import type { Product, ProductTag, Category } from "@/lib/types";
+
+const ALL_TAGS: { value: ProductTag; label: string }[] = [
+  { value: "new",       label: "New"       },
+  { value: "sale",      label: "Sale"      },
+  { value: "clearance", label: "Clearance" },
+];
 
 interface Props {
   product?: Product;
@@ -21,6 +27,9 @@ export default function ProductForm({ product, categories }: Props) {
     stock: product?.stock?.toString() ?? "",
     category: product?.category ?? "",
     active: product?.active ?? true,
+    tags: product?.tags ?? [] as ProductTag[],
+    comingSoon: product?.comingSoon ?? false,
+    availableAt: product?.availableAt ?? "",
     images: product?.images ?? [],
   });
   const [saving, setSaving] = useState(false);
@@ -129,6 +138,61 @@ export default function ProductForm({ product, categories }: Props) {
             className="rounded"
           />
           <label htmlFor="active" className="text-sm text-stone-700">Active (visible in store)</label>
+        </div>
+        <div className="col-span-2">
+          <label className="block text-sm font-medium text-stone-700 mb-2">Product Tags</label>
+          <div className="flex items-center gap-5">
+            {ALL_TAGS.map(({ value, label }) => {
+              const checked = (form.tags as ProductTag[]).includes(value);
+              return (
+                <label key={value} className="flex items-center gap-2 text-sm text-stone-700">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => {
+                      const next = e.target.checked
+                        ? [...(form.tags as ProductTag[]), value]
+                        : (form.tags as ProductTag[]).filter((t) => t !== value);
+                      set("tags", next);
+                    }}
+                    className="rounded"
+                  />
+                  {label}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Coming Soon */}
+        <div className="col-span-2 border border-stone-200 rounded-xl p-4 bg-stone-50 space-y-3">
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="comingSoon"
+              checked={form.comingSoon}
+              onChange={(e) => {
+                set("comingSoon", e.target.checked);
+                if (!e.target.checked) set("availableAt", "");
+              }}
+              className="rounded"
+            />
+            <span className="text-sm font-medium text-stone-700">Coming Soon <span className="font-normal text-stone-500">(disables purchase until live)</span></span>
+          </label>
+          {form.comingSoon && (
+            <div>
+              <label className="block text-xs font-medium text-stone-600 mb-1">Go Live Date &amp; Time <span className="text-stone-400">(optional — leave blank to stay coming soon until manually changed)</span></label>
+              <input
+                type="datetime-local"
+                value={form.availableAt ?? ""}
+                onChange={(e) => set("availableAt", e.target.value || "")}
+                className="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+              />
+              {form.availableAt && (
+                <p className="text-xs text-amber-700 mt-1">Product will automatically become purchasable at this date and time.</p>
+              )}
+            </div>
+          )}
         </div>
         <div className="col-span-2">
           <label className="block text-sm font-medium text-stone-700 mb-1">Description</label>

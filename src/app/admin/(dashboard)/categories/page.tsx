@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
 import CategoryManager from "./CategoryManager";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
+
 
 export default async function AdminCategoriesPage() {
   const categories = await db.listCategories();

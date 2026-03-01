@@ -7,6 +7,12 @@ export default function AddToCartButton({ product }: { product: Product }) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
 
+  const isComingSoon = product.comingSoon && (!product.availableAt || new Date() < new Date(product.availableAt));
+
+  if (isComingSoon) {
+    return <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full">Coming soon</span>;
+  }
+
   if (product.stock === 0) {
     return <span className="text-xs text-stone-400">Out of stock</span>;
   }

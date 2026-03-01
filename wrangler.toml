@@ -5,7 +5,8 @@ main = ".open-next/worker.js"
 assets = { directory = ".open-next/assets", binding = "ASSETS" }
 
 [vars]
-NEXT_PUBLIC_APP_URL = "https://thegildedbar.com"
+NEXT_PUBLIC_APP_URL = "https://georgia-suds.tgordo03.workers.dev"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_test_51T3Nne5Y8iCPVoPs3B0P9iKy4JJKn1KXONvmXdp0XTfxzfU9rrKbJmEKAUj47RKNtMirWztbXgghxzD6gHvaN3Xs00AISRS84F"
 
 # Secrets — add via: wrangler secret put <NAME>
 # Required: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, ADMIN_JWT_SECRET

@@ -3,7 +3,8 @@ import Hero from "@/components/storefront/Hero";
 import ProductGrid from "@/components/storefront/ProductGrid";
 import Link from "next/link";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
+
 
 export default async function HomePage() {
   const products = await db.queryProducts({ activeOnly: true, limit: 6 });

@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { verifyAdminToken, COOKIE_NAME } from "@/lib/admin-auth";
 import { db } from "@/lib/db";
 
-export const runtime = "edge";
 
 async function requireAdmin() {
   const cookieStore = await cookies();
@@ -23,7 +22,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!(await requireAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   const body = await req.json();
-  const allowed = ["name", "slug", "description", "price", "images", "stock", "category", "active"];
+  const allowed = ["name", "slug", "description", "price", "images", "stock", "category", "active", "tags", "comingSoon", "availableAt"];
   const updates: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in body) updates[key] = body[key];

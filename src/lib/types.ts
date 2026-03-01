@@ -1,5 +1,7 @@
 // ─── Firestore Domain Types ────────────────────────────────────────────────────
 
+export type ProductTag = "new" | "sale" | "clearance";
+
 export interface Product {
   id: string;
   name: string;
@@ -10,6 +12,9 @@ export interface Product {
   stock: number;
   category: string;    // category slug
   active: boolean;
+  tags: ProductTag[];  // e.g. ["new"], ["sale"], ["clearance"]
+  comingSoon: boolean;
+  availableAt: string | null; // ISO datetime when product goes live; null = indefinitely coming soon
   createdAt: string;   // ISO 8601
 }
 
@@ -44,6 +49,7 @@ export interface Order {
   stripePaymentIntentId: string;
   stripeSessionId: string;
   items: OrderItem[];
+  customerId: string;
   customerEmail: string;
   status: OrderStatus;
   shippingAddress: ShippingAddress;
@@ -66,6 +72,39 @@ export interface CartItem {
 
 export interface AdminJWTPayload {
   role: "admin";
+  iat: number;
+  exp: number;
+}
+
+// ─── Saved Shipping Address ────────────────────────────────────────────────────
+
+export interface SavedAddress {
+  id: string;
+  customerId: string;
+  name: string;
+  line1: string;
+  line2: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isDefault: boolean;
+  createdAt: string;
+}
+
+// ─── Customer ──────────────────────────────────────────────────────────────────
+
+export interface Customer {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface CustomerJWTPayload {
+  role: "customer";
+  sub: string;
+  email: string;
   iat: number;
   exp: number;
 }

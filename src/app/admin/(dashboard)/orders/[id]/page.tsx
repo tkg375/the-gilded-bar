@@ -3,7 +3,8 @@ import { db } from "@/lib/db";
 import type { OrderStatus } from "@/lib/types";
 import OrderStatusUpdater from "./OrderStatusUpdater";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
+
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
